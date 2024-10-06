@@ -2,17 +2,8 @@ import streamlit as st
 import pandas as pd
 import pydeck as pdk
 import numpy as np
-from streamlit_geolocation import streamlit_geolocation  # Doğru içe aktarma
-
-
-
-
 
 def display_emissions_map():
-    # Kullanıcının geolokasyonunu al
-    
-    
-
     # Veri setini yükle
     df = pd.read_csv('solid-waste-disposal_emissions_sources.csv')
 
@@ -52,23 +43,11 @@ def display_emissions_map():
     # Yıl seçimi için selectbox kullan
     year = st.selectbox('', [2021, 2022], index=1)  # Varsayılan değer 2022
 
-
-    
-
     # Seçilen yıla göre veriyi belirle
     if year == 2021:
         data_to_display = df_2021
     else:
         data_to_display = df_2022
-
-    location = streamlit_geolocation()
-    if location and 'latitude' in location and 'longitude' in location:
-        user_lat = location["latitude"]
-        user_lon = location["longitude"]
-    else:
-        user_lat, user_lon = None, None
-        st.error("Lokasyon bilgisi alınamadı. Lütfen izin verin ve butona basın.")
-
 
     # Emisyon yoğunluğunu hesapla ve en yoğun 10 konumu bul
     emissions_per_location = df_filtered.groupby(['lat', 'lon']).agg({
@@ -90,18 +69,11 @@ def display_emissions_map():
     top_10_locations['tooltip_content'] = 'Recommended Recycling Center Location'
 
     # Harita görünümünü tanımla
-    if user_lat and user_lon:
-        view_state = pdk.ViewState(
-            latitude=user_lat,
-            longitude=user_lon,
-            zoom=10
-        )
-    else:
-        view_state = pdk.ViewState(
-            latitude=data_to_display['lat'].mean(),
-            longitude=data_to_display['lon'].mean(),
-            zoom=6
-        )
+    view_state = pdk.ViewState(
+        latitude=data_to_display['lat'].mean(),
+        longitude=data_to_display['lon'].mean(),
+        zoom=6
+    )
 
     # CO2 emisyonlarına göre boyutlandırılmış noktaları gösteren katman
     layer_original = pdk.Layer(
@@ -123,28 +95,8 @@ def display_emissions_map():
         pickable=True
     )
 
-    # Kullanıcının konumu varsa bir katman ekle
-    if user_lat and user_lon:
-        user_location_df = pd.DataFrame({
-            'lat': [user_lat],
-            'lon': [user_lon],
-            'tooltip_content': ['Your Location']
-        })
-
-        user_location_layer = pdk.Layer(
-            'ScatterplotLayer',
-            data=user_location_df,
-            get_position='[lon, lat]',
-            get_radius=5000,
-            get_color=[0, 0, 255, 255],  # Mavi renk
-            pickable=True
-        )
-
-        # Tüm katmanları ekle
-        layers = [layer_original, layer_top_10, user_location_layer]
-    else:
-        # Kullanıcının konumu yoksa sadece orijinal katmanları ekle
-        layers = [layer_original, layer_top_10]
+    # Tüm katmanları ekle
+    layers = [layer_original, layer_top_10]
 
     # Tooltip'i güncelleyin
     r = pdk.Deck(

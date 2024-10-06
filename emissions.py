@@ -4,15 +4,9 @@ import pydeck as pdk
 import numpy as np
 from streamlit_geolocation import streamlit_geolocation  # Doğru içe aktarma
 
-
-
-
-
 def display_emissions_map():
     # Kullanıcının geolokasyonunu al
     
-    
-
     # Veri setini yükle
     df = pd.read_csv('solid-waste-disposal_emissions_sources.csv')
 
@@ -42,24 +36,14 @@ def display_emissions_map():
     # Emisyonları kullanıcı dostu bir string olarak formatla
     df_filtered['emissions_formatted'] = df_filtered.apply(lambda row: f"{int(row['emissions_quantity']):,}", axis=1)
 
-    # 2021 ve 2022 verilerini filtrele
-    df_2021 = df_filtered[df_filtered['year'] == 2021]
-    df_2022 = df_filtered[df_filtered['year'] == 2022]
-
     # Streamlit UI
     st.header("Landfill Emissions in Turkey")
 
     # Yıl seçimi için selectbox kullan
-    year = st.selectbox('', [2021, 2022], index=1)  # Varsayılan değer 2022
-
-
-    
+    year = st.selectbox('Select Year', [2021, 2022], index=1)  # Varsayılan değer 2022
 
     # Seçilen yıla göre veriyi belirle
-    if year == 2021:
-        data_to_display = df_2021
-    else:
-        data_to_display = df_2022
+    data_to_display = df_filtered[df_filtered['year'] == year]
 
     location = streamlit_geolocation()
     if location and 'latitude' in location and 'longitude' in location:
@@ -68,7 +52,6 @@ def display_emissions_map():
     else:
         user_lat, user_lon = None, None
         st.error("Lokasyon bilgisi alınamadı. Lütfen izin verin ve butona basın.")
-
 
     # Emisyon yoğunluğunu hesapla ve en yoğun 10 konumu bul
     emissions_per_location = df_filtered.groupby(['lat', 'lon']).agg({
@@ -84,6 +67,7 @@ def display_emissions_map():
         <div style="color:white;">{row['emissions_formatted']} tons CO<sub>2</sub>e in {row['year']}</div>
         <div style="color:white;">Rank: {row['rank']}</div>
         """
+    # Tooltip'leri doğru filtrelenmiş data_to_display için ayarlayın
     data_to_display['tooltip_content'] = data_to_display.apply(generate_tooltip_content, axis=1)
 
     # top_10_locations için tooltip_content ekleyin

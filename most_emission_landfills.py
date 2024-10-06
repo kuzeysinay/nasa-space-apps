@@ -18,11 +18,11 @@ def display_most_emission_landfills():
 
     # Create the bar chart using Altair
     chart = alt.Chart(top_10_landfills).mark_bar(color='#7d6400').encode(
-        x=alt.X('source_name:N', sort='-y', ),
+        x=alt.X('source_name:N', sort=alt.SortField('emissions_quantity', order='descending'), title='Landfill'),
         y=alt.Y('emissions_quantity:Q', title='Emissions Quantity (tons of CO2e)'),
-        tooltip=['source_name', 'emissions_quantity']
+        
     ).properties(
-        title='Top 10 Landfills with Highest CO2e Emissions',
+        title='Top 3 Landfills with Highest CO2e Emissions',
         width=700,
         height=400
     )

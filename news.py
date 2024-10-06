@@ -3,7 +3,7 @@ import requests
 from datetime import datetime
 
 # Place your API key here
-API_KEY = '35b10bad9e0c4b9280b31f2cf50a48d4'  # Put your own API key here
+API_KEY = 'e1fc82e10f9347f5840ee0bca72902b7'  # Put your own API key here
 
 def fetch_news(query):
     url = 'https://newsapi.org/v2/everything'

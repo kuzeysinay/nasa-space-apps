@@ -31,7 +31,6 @@ def main():
     nav_options = [
         "Home",
         "Emissions Map",
-        "Top Emission Producing Landfills",
         "News",
         "Greenhouse Gas Effects",
         "Top 10 Countries With Highest Emission"
@@ -46,14 +45,19 @@ def main():
             ### Home
             The goal of our NASA Space App Challenge is to highlight that waste is one of the main contributors to the greenhouse effect, emphasizing the urgency of sustainable waste management practices and innovative solutions to reduce our environmental impact.
         """)
+        left_co, cent_co,last_co = st.columns(3)
+        with cent_co:
+            st.image("icons/home_page.png", width=400)
+        
+        
     
     elif choice == "Emissions Map":
         st.markdown("### Emissions Map")
         display_emissions_map()
-    
-    elif choice == "Top Emission Producing Landfills":
-        st.markdown("### Top Emission Producing Landfills")
         display_most_emission_landfills()
+    
+  
+        
     
     elif choice == "News":
         st.markdown("### News")
